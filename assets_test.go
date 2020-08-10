@@ -30,6 +30,7 @@ var assets = map[string][]byte{}
 
 type fs struct{}
 
+// Get Data
 func (fs *fs) Get(name string) ([]byte, error) {
 	data, ok := assets[name]
 	if !ok {
@@ -41,7 +42,7 @@ func (fs *fs) Get(name string) ([]byte, error) {
 func init() {
 `, packageName)
 
-	defer fmt.Fprintln(w, `}`)
+	defer fmt.Fprintln(w, "}")
 
 	for _, dir := range dirs {
 		filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -53,14 +54,18 @@ func init() {
 				return err
 			}
 			path = filepath.ToSlash(path)
-			fmt.Fprintf(w, `	assets[%q] = []byte{`, path)
+			fmt.Fprintf(w, "	assets[%q] = []byte{\n", path)
 			for i := 0; i < len(b); i++ {
 				if i > 0 {
-					fmt.Fprintf(w, `, `)
+					if i%20 == 0 {
+						fmt.Fprintf(w, ",\n")
+					} else {
+						fmt.Fprintf(w, ", ")
+					}
 				}
-				fmt.Fprintf(w, `0x%02x`, b[i])
+				fmt.Fprintf(w, "0x%02x", b[i])
 			}
-			fmt.Fprintln(w, `}`)
+			fmt.Fprintln(w, "}")
 			return nil
 		})
 	}
