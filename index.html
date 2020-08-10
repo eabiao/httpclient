@@ -1,0 +1,95 @@
+<head>
+    <title>HttpClient</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+</head>
+
+<div>
+    URL<br/>
+    <div id="urlDiv">
+        <select id="methodSelect">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="POST">POST JSON</option>
+        </select>
+        <input id="urlText" type="text" spellcheck="false" value="http://"/>
+    </div>
+
+    Header<br/>
+    <textarea id="headerText" spellcheck="false"></textarea><br/>
+    <input id="sendButton" type="button" value="发送"/><br/>
+
+    Response<br/>
+    <textarea id="respText" spellcheck="false"></textarea><br/>
+</div>
+
+<script>
+    document.getElementById("sendButton").addEventListener("click", async function () {
+        let url = document.getElementById("urlText").value;
+        if (url === "") {
+            alert("url不能为空");
+            return
+        }
+
+        let method = document.getElementById("methodSelect").value;
+
+        let headerText = document.getElementById("headerText").value;
+        let headerArr = headerText.split("\n");
+
+        let headerMap = {};
+        for (let i = 0; i < headerArr.length; i++) {
+            let headerParts = headerArr[i].split(":");
+            if (headerParts.length === 2) {
+                headerMap[headerParts[0].trim()] = headerParts[1].trim()
+            }
+        }
+
+        document.getElementById("respText").value = await goHttpRequest(method, url, headerMap)
+    });
+
+    document.getElementById("methodSelect").addEventListener("change", function () {
+        if (this.options[this.selectedIndex].text === "POST JSON") {
+            document.getElementById("headerText").value = "Content-Type: application/json;charset=utf-8"
+        } else {
+            document.getElementById("headerText").value = ""
+        }
+    })
+</script>
+
+<style>
+    #urlDiv {
+        display: flex;
+    }
+
+    #methodSelect {
+        height: 30px;
+        margin-right: 2px;
+    }
+
+    #urlText {
+        flex: 1;
+        height: 30px;
+    }
+
+    #headerText {
+        width: 100%;
+        height: 80px;
+        resize: none;
+    }
+
+    #sendButton {
+        width: 60px;
+        height: 25px;
+        float: right;
+    }
+
+    #respText {
+        width: 100%;
+        height: 60%;
+        resize: none;
+    }
+
+    input, textarea {
+        margin-bottom: 5px;
+    }
+</style>
