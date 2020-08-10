@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 )
 
@@ -23,9 +24,19 @@ func main() {
 
 // 获取界面html
 func getHtmlText() string {
-	data, err := ioutil.ReadFile("./index.html")
-	if err != nil {
-		log.Fatal(err)
+	var indexHtmlFile = "page/index.html"
+
+	var data []byte
+	if _, err := os.Stat(indexHtmlFile); os.IsNotExist(err) {
+		data, err = Assets.Get(indexHtmlFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		data, err = ioutil.ReadFile(indexHtmlFile)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	return string(data)
 }
