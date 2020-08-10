@@ -73,11 +73,11 @@ func init() {
 			b := compress(data)
 
 			path = filepath.ToSlash(path)
-			fmt.Fprintf(w, "	assets[%q] = []byte{\n", path)
+			fmt.Fprintf(w, "	assets[%q] = []byte{\n\t\t", path)
 			for i := 0; i < len(b); i++ {
 				if i > 0 {
 					if i%20 == 0 {
-						fmt.Fprintf(w, ",\n")
+						fmt.Fprintf(w, ",\n\t\t")
 					} else {
 						fmt.Fprintf(w, ", ")
 					}
