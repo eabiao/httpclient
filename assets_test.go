@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"compress/zlib"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,6 +24,9 @@ func genAssets(packageName, file string, dirs ...string) error {
 	fmt.Fprintf(w, `package %s
 
 import (
+	"bytes"
+	"compress/zlib"
+	"io"
 	"os"
 )
 
@@ -36,7 +41,19 @@ func (fs *fs) Get(name string) ([]byte, error) {
 	if !ok {
 		return nil, os.ErrNotExist
 	}
-	return data, nil
+	return uncompress(data), nil
+}
+
+// uncompress
+func uncompress(data []byte) []byte {
+	var in bytes.Buffer
+	in.Write(data)
+	r, _ := zlib.NewReader(&in)
+	defer r.Close()
+
+	var out bytes.Buffer
+	io.Copy(&out, r)
+	return out.Bytes()
 }
 
 func init() {
@@ -49,10 +66,12 @@ func init() {
 			if info.IsDir() {
 				return nil
 			}
-			b, err := ioutil.ReadFile(path)
+			data, err := ioutil.ReadFile(path)
 			if err != nil {
 				return err
 			}
+			b := compress(data)
+
 			path = filepath.ToSlash(path)
 			fmt.Fprintf(w, "	assets[%q] = []byte{\n", path)
 			for i := 0; i < len(b); i++ {
@@ -70,4 +89,15 @@ func init() {
 		})
 	}
 	return nil
+}
+
+// 压缩
+func compress(data []byte) []byte {
+	var buff bytes.Buffer
+	w := zlib.NewWriter(&buff)
+	defer w.Close()
+
+	w.Write(data)
+	w.Flush()
+	return buff.Bytes()
 }
