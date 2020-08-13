@@ -10,6 +10,7 @@ import (
 	"testing"
 )
 
+//go:generate go test -run TestGenAssets assets_test.go
 func TestGenAssets(t *testing.T) {
 	genAssets("main", "assets.go", "page")
 }
@@ -73,11 +74,11 @@ func init() {
 			b := compress(data)
 
 			path = filepath.ToSlash(path)
-			fmt.Fprintf(w, "	assets[%q] = []byte{\n\t\t", path)
+			fmt.Fprintf(w, "assets[%q] = []byte{\n", path)
 			for i := 0; i < len(b); i++ {
 				if i > 0 {
 					if i%20 == 0 {
-						fmt.Fprintf(w, ",\n\t\t")
+						fmt.Fprintf(w, ",\n")
 					} else {
 						fmt.Fprintf(w, ", ")
 					}
