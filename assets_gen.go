@@ -1,3 +1,5 @@
+// +build generate
+
 package main
 
 import (
@@ -7,11 +9,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"testing"
 )
 
-//go:generate go test -run TestGenAssets assets_test.go
-func TestGenAssets(t *testing.T) {
+//go:generate go run assets_gen.go
+//go:generate go fmt assets.go
+func main() {
 	genAssets("main", "assets.go", "page")
 }
 
